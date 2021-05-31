@@ -2,14 +2,14 @@ package Autohandel.Vehicles;
 
 public class EnumClass {
     public enum Vehicle {
-        Car, Truck, Motorcycle
+        CAR, TRUCK, MOTORCYCLE
     }
 
     public enum Condition {
-        Wreckage, Suspension_Broken, As_New
+        WRECKAGE, SUSPENSION_BROKEN, AS_NEW
     }
 
     public enum Segment {
-        premium, standard, budget
+        PREMIUM, STANDARD, BUDGET
     }
 }
