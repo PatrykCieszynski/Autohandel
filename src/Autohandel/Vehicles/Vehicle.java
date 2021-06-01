@@ -9,7 +9,7 @@ public abstract class Vehicle {
     Integer mileage;
     String color;
     EnumClass.Segment segment;
-    EfficientElements efficientElements;
+    public EfficientElements efficientElements;
 
     public final static String[] DEFAULT_BRANDS =  {"Fiat", "Volvo", "Citroen", "Skoda", "Renault", "Audi", "Ford"};
     final static String[] DEFAULT_COLORS = {"Blue", "Red", "Black", "White", "Orange", "Green", "Yellow", "Brown", "Silver", "Gray"};
@@ -19,7 +19,7 @@ public abstract class Vehicle {
         this.mileage = mileage;
         this.color = color;
         this.segment = segment;
-        this.efficientElements = new EfficientElements();
+        this.efficientElements = new EfficientElements(this);
         this.value = generateValue();
     }
 
