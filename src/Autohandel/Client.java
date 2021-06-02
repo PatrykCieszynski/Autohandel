@@ -2,6 +2,8 @@ package Autohandel;
 
 import Autohandel.Vehicles.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
@@ -10,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Client {
     String name;
     String surname;
-    Double cash;
+    BigDecimal cash;
     String[] favBrands;
     EnumClass.Vehicle interestedInVehicle;
     EnumClass.Condition interestedInCondition;
@@ -18,7 +20,7 @@ public class Client {
     final static String[] DEFAULT_NAMES =  {"Jan", "Maciej", "Michał", "Aleks", "Mikołaj", "Kacper", "Mirosław", "Amadeusz", "Piotr", "Paweł", "Dawid", "Olaf", "Florian", "Józef", "Krzysztof"};
     final static String[] DEFAULT_SURNAMES = {"Włodarczyk", "Lewandowski", "Kalinowski", "Głowacki", "Witkowski", "Kubiak", "Sokołowski", "Pawlak", "Borkowski", "Baranowski", "Pietrzak", "Jaworski", "Mazurek" , "Wysocki" , "Mróz"};
 
-    public Client(String name, String surname, Double cash,String[] favBrands, EnumClass.Vehicle interestedInVehicle, EnumClass.Condition interestedInCondition) {
+    public Client(String name, String surname, BigDecimal cash, String[] favBrands, EnumClass.Vehicle interestedInVehicle, EnumClass.Condition interestedInCondition) {
         this.name = name;
         this.surname = surname;
         this.cash = cash;
@@ -40,14 +42,15 @@ public class Client {
         String name = DEFAULT_NAMES[randomName];
         int randomSurname = ThreadLocalRandom.current().nextInt(0, DEFAULT_SURNAMES.length);
         String surname = DEFAULT_NAMES[randomSurname];
-        Double cash = (double) ThreadLocalRandom.current().nextInt(15000, 45000 + 1);
+        BigDecimal cash = BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(15000, 45000 + 1));
+        cash = cash.setScale(2, RoundingMode.DOWN);
         int randomBrand1;
         int randomBrand2;
         do {
-            randomBrand1 = ThreadLocalRandom.current().nextInt(0, Vehicle.DEFAULT_BRANDS.length);
-            randomBrand2 = ThreadLocalRandom.current().nextInt(0, Vehicle.DEFAULT_BRANDS.length);
+            randomBrand1 = ThreadLocalRandom.current().nextInt(0, Vehicle.getDefaultBrands().length);
+            randomBrand2 = ThreadLocalRandom.current().nextInt(0, Vehicle.getDefaultBrands().length);
         } while(randomBrand1 == randomBrand2);
-        String[] favBrands = new String[]{Vehicle.DEFAULT_BRANDS[randomBrand1], Vehicle.DEFAULT_BRANDS[randomBrand2]};
+        String[] favBrands = new String[]{Vehicle.getDefaultBrands()[randomBrand1], Vehicle.getDefaultBrands()[randomBrand2]};
         int randomVehicle = ThreadLocalRandom.current().nextInt(0, EnumClass.Vehicle.values().length);
         EnumClass.Vehicle vehicle = EnumClass.Vehicle.values()[randomVehicle];
         int randomCondition = ThreadLocalRandom.current().nextInt(0, 100);

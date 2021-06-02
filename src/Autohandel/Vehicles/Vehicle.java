@@ -1,17 +1,19 @@
 package Autohandel.Vehicles;
 
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class Vehicle {
-    Double value;
+    BigDecimal value;
     String brand;
     Integer mileage;
     String color;
     EnumClass.Segment segment;
-    public EfficientElements efficientElements;
+    EfficientElements efficientElements;
 
-    public final static String[] DEFAULT_BRANDS =  {"Fiat", "Volvo", "Citroen", "Skoda", "Renault", "Audi", "Ford"};
+    final static String[] DEFAULT_BRANDS =  {"Fiat", "Volvo", "Citroen", "Skoda", "Renault", "Audi", "Ford"};
     final static String[] DEFAULT_COLORS = {"Blue", "Red", "Black", "White", "Orange", "Green", "Yellow", "Brown", "Silver", "Gray"};
 
     public Vehicle(String brand, Integer mileage, String color, EnumClass.Segment segment) {
@@ -44,7 +46,11 @@ public abstract class Vehicle {
         return vehicles;
     }
 
-    public abstract Double generateValue();
+    public abstract BigDecimal generateValue();
+
+    public void setValue(BigDecimal multiplier) {
+        this.value = this.value.multiply(multiplier);
+    }
 
     public EnumClass.Condition getCondition() {
         int efficientElementCounter = efficientElements.getEfficientNumberParts();
@@ -53,6 +59,21 @@ public abstract class Vehicle {
         else if (efficientElements.getSuspension())
             return EnumClass.Condition.SUSPENSION_BROKEN;
         return EnumClass.Condition.WRECKAGE;
+    }
+
+    public static String[] getDefaultBrands() {
+        return DEFAULT_BRANDS;
+    }
+    public String getBrand() {
+        return this.brand;
+    }
+
+    public BigDecimal getValue() {
+        return this.value;
+    }
+
+    public EfficientElements getEfficientElements() {
+        return this.efficientElements;
     }
 
     @Override
