@@ -67,25 +67,27 @@ public abstract class Vehicle {
     public String getBrand() {
         return this.brand;
     }
-
     public BigDecimal getValue() {
         return this.value;
     }
-
     public EfficientElements getEfficientElements() {
         return this.efficientElements;
+    }
+    public String getType() {
+        if(this instanceof Car) return "Samochód";
+        else if(this instanceof Truck) return "Dostawczak";
+        else return "Motocykl";
     }
 
     @Override
     public String toString() {
-        return "Vehicle{" + "\n" +
-                "Type=" + this.getClass() + "\n" +
-                "value=" + value + "\n" +
-                "brand='" + brand + '\'' + "\n" +
-                "mileage=" + mileage + "\n" +
-                "color='" + color + '\'' + "\n" +
-                "segment=" + segment + "\n" +
-                "Elements=" + efficientElements + "\n" +
-                '}';
+        return  " {" + "\n" +
+                "Typ = " + getType() + "\n" +
+                "Wartość = " + value + "\n" +
+                "Marka = " + brand + "\n" +
+                "Przebieg = " + mileage + "\n" +
+                "Kolor = " + color + "\n" +
+                "Segment = " + segment + "\n" +
+                "Części = " + efficientElements + "\n" + " }";
     }
 }

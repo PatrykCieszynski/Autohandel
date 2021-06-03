@@ -26,8 +26,14 @@ public class EfficientElements {
         int randomInt = ThreadLocalRandom.current().nextInt(0, 100);
         System.out.println("Wybierz część:");
         String choosePart = getPart();
+        if(choosePart == null) {
+            System.out.println("Taka część nie istnieje:");
+            return false;
+        }
         BigDecimal multiplier = getMultiplier(choosePart);
         BigDecimal repairCost = getRepairCost(choosePart, vehicle.getBrand());
+        if(this.vehicle instanceof Motorcycle)
+            repairCost = repairCost.multiply(new BigDecimal("0.8"));
         if(this.elements.get(choosePart)) {
             System.out.println("Ta część jest sprawna");
             return false;
@@ -38,49 +44,49 @@ public class EfficientElements {
         System.out.println("2. Marian - " + "" + "90% na udaną naprawę, koszt " + repairCost.multiply(new BigDecimal("1.2")));
         System.out.println("3. Adrian - " + "" + "80% na udaną naprawę , ALE 2% ŻE ZEPSUJE COŚ INNEGO, koszt " + repairCost);
         mechanic = userInput.nextInt();
-        switch(mechanic) {
-            case 1:
+        switch (mechanic) {
+            case 1 -> {
                 owner.pay(repairCost.multiply(new BigDecimal("1.5")));
-                this.elements.put(choosePart,true);
+                this.elements.put(choosePart, true);
                 vehicle.setValue(multiplier);
                 return true;
-            case 2:
+            }
+            case 2 -> {
                 owner.pay(repairCost.multiply(new BigDecimal("1.2")));
-                if(randomInt >= 10) {
-                    this.elements.put(choosePart,true);
+                if (randomInt >= 10) {
+                    this.elements.put(choosePart, true);
                     vehicle.setValue(multiplier);
                     return true;
-                }
-                else {
+                } else {
                     System.out.println("Mechanik nie podołał :/");
                     return false;
                 }
-            case 3:
+            }
+            case 3 -> {
                 owner.pay(repairCost);
-                if(randomInt >= 20) {
-                    this.elements.put(choosePart,true);
+                if (randomInt >= 20) {
+                    this.elements.put(choosePart, true);
                     vehicle.setValue(multiplier);
                     return true;
-                }
-                else if(randomInt < 2) {
+                } else if (randomInt < 2) {
                     String part = getRandomGoodPart();
-                    if(part != null) {
+                    if (part != null) {
                         System.out.println("Mechanik nie podołał, a nawet zepsuł inną część :/");
-                        this.elements.put(getRandomGoodPart(),false);
-                    }
-                    else
-                    {
+                        this.elements.put(getRandomGoodPart(), false);
+                    } else {
                         System.out.println("Mechanik nie podołał, gdyby mógł to jeszcze by coś zepsuł, ale to totalny wrak");
                     }
 
                     return false;
-                }
-                else {
+                } else {
                     System.out.println("Mechanik nie podołał :/");
                     return false;
                 }
-            default:
+            }
+            default -> {
+                System.out.println("Zły numer mechanika");
                 return false;
+            }
         }
     }
     public BigDecimal getRepairCost(String part, String brand) {
@@ -162,14 +168,18 @@ public class EfficientElements {
         }
     }
 
+    public String getCondition(String part) {
+        if(elements.get(part)) return "Sprawne";
+        else return "Niesprawne";
+    }
+
     @Override
     public String toString() {
-        return "EfficientElements{" + "\n" +
-                "   brakes=" + elements.get("Brakes") + "\n" +
-                "   suspension=" + elements.get("Suspension") + "\n" +
-                "   engine=" + elements.get("Engine") + "\n" +
-                "   body=" + elements.get("Body") + "\n" +
-                "   gearbox=" + elements.get("Gearbox") + "\n" +
-                "   }";
+        return  " {" + "\n" +
+                "   Hamulce = " + getCondition("Brakes") + "\n" +
+                "   Zawieszenie = " + getCondition("Suspension") + "\n" +
+                "   Silnik = " + getCondition("Engine") + "\n" +
+                "   Karoseria = " + getCondition("Body") + "\n" +
+                "   Skrzynia biegów = " + getCondition("Gearbox") + "\n" + " }";
     }
 }

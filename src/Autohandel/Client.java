@@ -79,13 +79,28 @@ public class Client {
         else return interestedInCondition == EnumClass.Condition.AS_NEW && veh.getCondition() == EnumClass.Condition.AS_NEW;
     }
 
+    public String getVehicleType() {
+        return switch(this.interestedInVehicle) {
+            case CAR -> "Samochodu";
+            case TRUCK -> "Dostawczaka";
+            case MOTORCYCLE -> "Motocykla";
+        };
+    }
+    public String getVehicleCondition() {
+        return switch(this.interestedInCondition) {
+            case AS_NEW -> "Nowy";
+            case SUSPENSION_BROKEN -> "Z zepsutym zawieszeniem";
+            case WRECKAGE -> "Wrak";
+        };
+    }
+
     @Override
     public String toString() {
-        return "Client{" + "\n" +
-                "cash=" + cash + "\n" +
-                "favBrand=" + Arrays.toString(favBrands) + "\n" +
-                "interestedInVehicle=" + interestedInVehicle + "\n" +
-                "interestedInCondition=" + interestedInCondition + "\n" +
-                "}";
+        return  " {" + "\n" +
+                name + " " + surname + "\n" +
+                "Pieniądze = " + cash + "\n" +
+                "Zainteresowany marką = " + Arrays.toString(favBrands) + "\n" +
+                "Szuka = " + getVehicleType() + "\n" +
+                "W stanie = " + getVehicleCondition() + "\n" + " }";
     }
 }
