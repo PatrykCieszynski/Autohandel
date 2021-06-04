@@ -46,12 +46,16 @@ public class EfficientElements {
         mechanic = userInput.nextInt();
         switch (mechanic) {
             case 1 -> {
+                vehicle.addToRepairHistory("Naprawiłeś" + translatePart(choosePart) + " w pojeździe " + vehicle + " za " + repairCost.multiply(new BigDecimal("1.5")));
+                vehicle.addToSumOfRepairs(repairCost.multiply(new BigDecimal("1.5")));
                 owner.pay(repairCost.multiply(new BigDecimal("1.5")));
                 this.elements.put(choosePart, true);
                 vehicle.setValue(multiplier);
                 return true;
             }
             case 2 -> {
+                vehicle.addToRepairHistory("Naprawiłeś" + translatePart(choosePart) + " w pojeździe " + vehicle +" za " + repairCost.multiply(new BigDecimal("1.2")));
+                vehicle.addToSumOfRepairs(repairCost.multiply(new BigDecimal("1.2")));
                 owner.pay(repairCost.multiply(new BigDecimal("1.2")));
                 if (randomInt >= 10) {
                     this.elements.put(choosePart, true);
@@ -63,6 +67,8 @@ public class EfficientElements {
                 }
             }
             case 3 -> {
+                vehicle.addToRepairHistory("Naprawiłeś" + translatePart(choosePart) + " w pojeździe " + vehicle +" za " + repairCost);
+                vehicle.addToSumOfRepairs(repairCost);
                 owner.pay(repairCost);
                 if (randomInt >= 20) {
                     this.elements.put(choosePart, true);
@@ -171,6 +177,16 @@ public class EfficientElements {
     public String getCondition(String part) {
         if(elements.get(part)) return "Sprawne";
         else return "Niesprawne";
+    }
+    public String translatePart(String part) {
+        return switch(part) {
+            case "Brakes" -> "Hamulce";
+            case "Suspension" -> "Zawieszenie";
+            case "Engine" -> "Silnik";
+            case "Body" -> "Karoserie";
+            case "Gearbox" -> "Skrzynia biegów";
+            default -> part;
+        };
     }
 
     @Override

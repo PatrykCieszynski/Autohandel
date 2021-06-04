@@ -12,12 +12,15 @@ public class Main {
 
     static ArrayList<Player> setupPlayers() {
         ArrayList<Player> players = new ArrayList<>();
-        int playersNumber;
         while(true) {
             try {
+                int playersNumber;
                 Scanner userInput = new Scanner(System.in);
                 System.out.println("Podaj liczbę graczy: ");
                 playersNumber = userInput.nextInt();
+                if(playersNumber == 0) {
+                    throw new InputMismatchException("Liczba graczy nie może wynosić 0");
+                }
                 for(int i = 0; i < playersNumber; i++) {
                     System.out.println("Podaj imię " + (i+1) + " gracza: ");
                     String name = userInput.next();
@@ -26,7 +29,10 @@ public class Main {
                 break;
             }
             catch(InputMismatchException | NumberFormatException ex) {
-                System.out.println("Niepoprawna liczba");
+                System.out.println("Niedozwolona liczba, spróbuj ponownie");
+            }
+            catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return players;
@@ -35,12 +41,12 @@ public class Main {
         Scanner userInput = new Scanner(System.in);
         System.out.println("Tura: " + turn);
         System.out.println(activePlayer);
-        System.out.println("1.Przeglądaj samochody");
-        System.out.println("2.Kup samochód");
-        System.out.println("3.Przeglądaj posiadane samochody");
-        System.out.println("4.Napraw samochód");
+        System.out.println("1.Przeglądaj pojazdy");
+        System.out.println("2.Kup pojazd");
+        System.out.println("3.Przeglądaj posiadane pojazdy");
+        System.out.println("4.Napraw pojazd");
         System.out.println("5.Przejrzyj wszystkich klientów");
-        System.out.println("6.Sprzedaj samochód");
+        System.out.println("6.Sprzedaj pojazd");
         System.out.println("7.Kup reklamę");
         System.out.println("8.Sprawdź stan konta");
         System.out.println("9.Sprawdź historię transakcji");
@@ -67,7 +73,7 @@ public class Main {
     }
 
     static Boolean listVehicles(ArrayList<Vehicle> vehicles) {
-        System.out.println("Samochody dostępne na rynku");
+        System.out.println("Pojazdy dostępne na rynku");
         int i = 1;
         for (Vehicle veh: vehicles) {
             System.out.println("Samochód nr " + i + veh);
@@ -81,7 +87,7 @@ public class Main {
         while(true) {
             try {
                 Scanner userInput = new Scanner(System.in);
-                System.out.println("Podaj numer samochodu który chcesz kupić");
+                System.out.println("Podaj numer pojazdu który chcesz kupić");
                 choice = userInput.nextInt() - 1;
                 try {
                     return activePlayer.buyVehicle(vehicles.get(choice),vehicles);
@@ -98,10 +104,10 @@ public class Main {
         return false;
     }
     static Boolean listYourVehicles(Player activePlayer) {
-        System.out.println("Twoje samochody");
+        System.out.println("Twoje pojazdy");
         int i = 1;
         for (Vehicle veh: activePlayer.getVehicles()) {
-            System.out.println("Samochód nr " + i + veh);
+            System.out.println("Pojazd nr " + i + veh);
             i++;
         }
         return false;
@@ -123,7 +129,7 @@ public class Main {
                 break;
             }
             catch(InputMismatchException | NumberFormatException ex) {
-                System.out.println("Nie posiadasz samochodu z takim numerem");
+                System.out.println("Niedozwolony wybór, spróbuj ponownie");
             }
         }
         return false;
@@ -138,8 +144,26 @@ public class Main {
         return false;
     }
     static Boolean sellVehicle(Player activePlayer, ArrayList<Client> clients) {
-        // TODO
-        return true;
+        listYourVehicles(activePlayer);
+        int choice;
+        while(true) {
+            try {
+                Scanner userInput = new Scanner(System.in);
+                System.out.println("Podaj numer samochodu który chcesz sprzedać");
+                choice = userInput.nextInt() - 1;
+                try {
+                    return activePlayer.getInterestedClients(activePlayer.getVehicle(choice),clients);
+                }
+                catch(IndexOutOfBoundsException ex) {
+                    System.out.println("Pojazd z tym numerem nie istnieje, spróbuj ponownie");
+                }
+                break;
+            }
+            catch(InputMismatchException | NumberFormatException ex) {
+                System.out.println("Niedozwolony wybór");
+            }
+        }
+        return false;
     }
     static Boolean buyAd(Player activePlayer, ArrayList<Client> clients) {
         final BigDecimal DEFAULT_NEWSPAPER_AD_COST = new BigDecimal("200");
@@ -151,7 +175,7 @@ public class Main {
                 Scanner userInput = new Scanner(System.in);
                 System.out.println("Jaką reklamę chcesz kupić?");
                 System.out.println("1.Ogłoszenie w gazecie - koszt " + DEFAULT_NEWSPAPER_AD_COST);
-                System.out.println("2.Ogłoszenie w internecie - ksozt " + DEFAULT_INTERNET_AD_COST);
+                System.out.println("2.Ogłoszenie w internecie - koszt " + DEFAULT_INTERNET_AD_COST);
                 choice = userInput.nextInt();
                 switch(choice) {
                     case 1 -> {
@@ -160,38 +184,78 @@ public class Main {
                         for(int i = 0; i < r; i++) {
                             clients.add(Client.AddRandomClient());
                         }
+                        return true;
                     }
                     case 2 -> {
                         activePlayer.pay(DEFAULT_INTERNET_AD_COST);
                         clients.add(Client.AddRandomClient());
+                        return true;
                     }
                     default -> {
-                        System.out.println("Niepoprawny wybór");
+                        System.out.println("Nie ma takiej opcji");
                         return false;
                     }
                 }
-                break;
             }
             catch(InputMismatchException | NumberFormatException ex) {
-                System.out.println("Niepoprawny wybór");
+                System.out.println("Niedozwolony wybór");
             }
         }
-        return false;
     }
     static Boolean checkAccount(Player activePlayer) {
         System.out.println("Stan konta: " + activePlayer.getCash());
         return false;
     }
     static Boolean checkAccountHistory(Player activePlayer) {
-        //TODO Jeszcze nie wiem jak :/
+        for (String transaction : activePlayer.getTransactionHistory()) {
+            System.out.println(transaction);
+        }
         return false;
     }
     static Boolean checkRepairHistory(Player activePlayer) {
-        //TODO Jeszcze nie wiem jak :/
+        listYourVehicles(activePlayer);
+        int choice;
+        while(true) {
+            try {
+                Scanner userInput = new Scanner(System.in);
+                System.out.println("Podaj numer samochodu którego hitorię napraw chcesz wyświetlić");
+                choice = userInput.nextInt() - 1;
+                try {
+                    for (String repair : activePlayer.getVehicle(choice).getRepairHistory()) {
+                        System.out.println(repair);
+                    }
+                }
+                catch(IndexOutOfBoundsException ex) {
+                    System.out.println("Pojazd z tym numerem nie istnieje, spróbuj ponownie");
+                }
+                break;
+            }
+            catch(InputMismatchException | NumberFormatException ex) {
+                System.out.println("Niedozwolony wybór, spróbuj ponownie");
+            }
+        }
         return false;
     }
     static Boolean checkRepairCostSum(Player activePlayer) {
-        //TODO Jeszcze nie wiem jak :/
+        listYourVehicles(activePlayer);
+        int choice;
+        while(true) {
+            try {
+                Scanner userInput = new Scanner(System.in);
+                System.out.println("Podaj numer samochodu którego hitorię napraw chcesz wyświetlić");
+                choice = userInput.nextInt() - 1;
+                try {
+                    System.out.println("Suma napraw " + activePlayer.getVehicle(choice).getSumOfRepairs());
+                }
+                catch(IndexOutOfBoundsException ex) {
+                    System.out.println("Pojazd z tym numerem nie istnieje, spróbuj ponownie");
+                }
+                break;
+            }
+            catch(InputMismatchException | NumberFormatException ex) {
+                System.out.println("Niedozwolony wybór, spróbuj ponownie");
+            }
+        }
         return false;
     }
 
@@ -199,6 +263,7 @@ public class Main {
         int turn = 0;
         ArrayList<Player> players = setupPlayers();
         ArrayList<Client> clients = Client.generateRandomClients(10);
+        int winner = 0;
         do { //Pętla dla gry
             turn++;
             ArrayList<Vehicle> vehicles = Vehicle.generateRandomVehicles(15);
@@ -207,8 +272,12 @@ public class Main {
                 do {
                     condition = play(activePlayer, turn, clients, vehicles);
                 } while(!condition);
+                if(activePlayer.getCash().compareTo(Player.DEFAULT_STARTING_CASH.multiply(new BigDecimal("2"))) >= 0) {
+                    System.out.println(activePlayer + " wygrywa.\nPodwoił swoje pieniądze w " + turn + " tur");
+                    winner = 1;
+                    break;
+                }
             }
-        } while(true);
-
+        } while(winner == 0);
     }
 }

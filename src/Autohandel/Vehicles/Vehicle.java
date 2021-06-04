@@ -12,6 +12,8 @@ public abstract class Vehicle {
     String color;
     EnumClass.Segment segment;
     EfficientElements efficientElements;
+    ArrayList<String> repairHistory = new ArrayList<>();
+    BigDecimal sumOfRepairs;
 
     final static String[] DEFAULT_BRANDS =  {"Fiat", "Volvo", "Citroen", "Skoda", "Renault", "Audi", "Ford"};
     final static String[] DEFAULT_COLORS = {"Blue", "Red", "Black", "White", "Orange", "Green", "Yellow", "Brown", "Silver", "Gray"};
@@ -23,6 +25,7 @@ public abstract class Vehicle {
         this.segment = segment;
         this.efficientElements = new EfficientElements(this);
         this.value = generateValue();
+        this.sumOfRepairs = new BigDecimal("0");
     }
 
     public static ArrayList<Vehicle> generateRandomVehicles(int x) {
@@ -51,6 +54,12 @@ public abstract class Vehicle {
     public void setValue(BigDecimal multiplier) {
         this.value = this.value.multiply(multiplier);
     }
+    public void addToRepairHistory(String repair) {
+        repairHistory.add(repair);
+    }
+    public void addToSumOfRepairs(BigDecimal repair) {
+        sumOfRepairs = sumOfRepairs.add(repair);
+    }
 
     public EnumClass.Condition getCondition() {
         int efficientElementCounter = efficientElements.getEfficientNumberParts();
@@ -60,7 +69,6 @@ public abstract class Vehicle {
             return EnumClass.Condition.SUSPENSION_BROKEN;
         return EnumClass.Condition.WRECKAGE;
     }
-
     public static String[] getDefaultBrands() {
         return DEFAULT_BRANDS;
     }
@@ -77,6 +85,12 @@ public abstract class Vehicle {
         if(this instanceof Car) return "Samochód";
         else if(this instanceof Truck) return "Dostawczak";
         else return "Motocykl";
+    }
+    public ArrayList<String> getRepairHistory() {
+        return this.repairHistory;
+    }
+    public BigDecimal getSumOfRepairs() {
+        return this.sumOfRepairs;
     }
 
     @Override

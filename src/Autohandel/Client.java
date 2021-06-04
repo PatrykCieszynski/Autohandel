@@ -41,7 +41,7 @@ public class Client {
         int randomName = ThreadLocalRandom.current().nextInt(0, DEFAULT_NAMES.length);
         String name = DEFAULT_NAMES[randomName];
         int randomSurname = ThreadLocalRandom.current().nextInt(0, DEFAULT_SURNAMES.length);
-        String surname = DEFAULT_NAMES[randomSurname];
+        String surname = DEFAULT_SURNAMES[randomSurname];
         BigDecimal cash = BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(15000, 45000 + 1));
         cash = cash.setScale(2, RoundingMode.DOWN);
         int randomBrand1;
@@ -77,6 +77,17 @@ public class Client {
         else if (interestedInCondition == EnumClass.Condition.SUSPENSION_BROKEN && veh.getCondition() != EnumClass.Condition.WRECKAGE)
             return true;
         else return interestedInCondition == EnumClass.Condition.AS_NEW && veh.getCondition() == EnumClass.Condition.AS_NEW;
+    }
+    public boolean checkVehicleBrand(Vehicle veh) {
+        return favBrands[0].equals(veh.getBrand()) || favBrands[1].equals(veh.getBrand());
+    }
+
+    public Boolean checkIfInterested(Vehicle veh) {
+        return this.checkVehicleCondition(veh) && this.checkVehicleType(veh) && this.checkVehicleBrand(veh);
+    }
+
+    public BigDecimal getCash() {
+        return this.cash;
     }
 
     public String getVehicleType() {
