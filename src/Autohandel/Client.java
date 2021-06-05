@@ -3,6 +3,7 @@ package Autohandel;
 import Autohandel.Vehicles.*;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,17 +17,19 @@ public class Client {
     String[] favBrands;
     EnumClass.Vehicle interestedInVehicle;
     EnumClass.Condition interestedInCondition;
+    Integer minimumCargo;
 
     final static String[] DEFAULT_NAMES =  {"Jan", "Maciej", "Michał", "Aleks", "Mikołaj", "Kacper", "Mirosław", "Amadeusz", "Piotr", "Paweł", "Dawid", "Olaf", "Florian", "Józef", "Krzysztof"};
     final static String[] DEFAULT_SURNAMES = {"Włodarczyk", "Lewandowski", "Kalinowski", "Głowacki", "Witkowski", "Kubiak", "Sokołowski", "Pawlak", "Borkowski", "Baranowski", "Pietrzak", "Jaworski", "Mazurek" , "Wysocki" , "Mróz"};
 
-    public Client(String name, String surname, BigDecimal cash, String[] favBrands, EnumClass.Vehicle interestedInVehicle, EnumClass.Condition interestedInCondition) {
+    public Client(String name, String surname, BigDecimal cash, String[] favBrands, EnumClass.Vehicle interestedInVehicle, EnumClass.Condition interestedInCondition, Integer cargo) {
         this.name = name;
         this.surname = surname;
         this.cash = cash;
         this.favBrands = favBrands;
         this.interestedInVehicle = interestedInVehicle;
         this.interestedInCondition = interestedInCondition;
+        this.minimumCargo = cargo;
     }
 
     public static ArrayList<Client> generateRandomClients(int x) {
@@ -61,14 +64,20 @@ public class Client {
             condition = EnumClass.Condition.SUSPENSION_BROKEN;
         else
             condition = EnumClass.Condition.AS_NEW;
-        return new Client(name, surname, cash, favBrands, vehicle, condition);
+        Integer cargo;
+        if(vehicle == EnumClass.Vehicle.TRUCK)
+            cargo = ThreadLocalRandom.current().nextInt(100, 300 + 1) * 10;
+        else
+            cargo = null;
+        return new Client(name, surname, cash, favBrands, vehicle, condition, cargo);
     }
 
     public boolean checkVehicleType(Vehicle veh) {
         if(interestedInVehicle == EnumClass.Vehicle.CAR && veh instanceof Car)
             return true;
-        else if (interestedInVehicle == EnumClass.Vehicle.TRUCK && veh instanceof Truck)
-            return true;
+        else if (interestedInVehicle == EnumClass.Vehicle.TRUCK && veh instanceof Truck) {
+            return checkCargo((Truck) veh);
+        }
         return interestedInVehicle == EnumClass.Vehicle.MOTORCYCLE && veh instanceof Motorcycle;
     }
     public boolean checkVehicleCondition(Vehicle veh) {
@@ -85,19 +94,22 @@ public class Client {
     public Boolean checkIfInterested(Vehicle veh) {
         return this.checkVehicleCondition(veh) && this.checkVehicleType(veh) && this.checkVehicleBrand(veh);
     }
+    public Boolean checkCargo(Truck truck) {
+        return truck.getCargoSpace() >= this.minimumCargo;
+    }
 
     public BigDecimal getCash() {
         return this.cash;
     }
 
-    public String getVehicleType() {
+    public String translateVehicleType() {
         return switch(this.interestedInVehicle) {
             case CAR -> "Samochodu";
             case TRUCK -> "Dostawczaka";
             case MOTORCYCLE -> "Motocykla";
         };
     }
-    public String getVehicleCondition() {
+    public String translateVehicleCondition() {
         return switch(this.interestedInCondition) {
             case AS_NEW -> "Nowy";
             case SUSPENSION_BROKEN -> "Z zepsutym zawieszeniem";
@@ -107,11 +119,14 @@ public class Client {
 
     @Override
     public String toString() {
-        return  " {" + "\n" +
+        String a = " {" + "\n" +
                 name + " " + surname + "\n" +
                 "Pieniądze = " + cash + "\n" +
                 "Zainteresowany marką = " + Arrays.toString(favBrands) + "\n" +
-                "Szuka = " + getVehicleType() + "\n" +
-                "W stanie = " + getVehicleCondition() + "\n" + " }";
+                "Szuka = " + translateVehicleType() + "\n" +
+                "W stanie = " + translateVehicleCondition() + "\n";
+        if(interestedInVehicle == EnumClass.Vehicle.TRUCK)
+            return a + "Z pojemnością " + minimumCargo + "\n" + " }";
+        else return a + " }";
     }
 }

@@ -76,7 +76,7 @@ public class Main {
         System.out.println("Pojazdy dostępne na rynku");
         int i = 1;
         for (Vehicle veh: vehicles) {
-            System.out.println("Samochód nr " + i + veh);
+            System.out.println("Pojazd nr " + i + veh);
             i++;
         }
         return false;
@@ -118,7 +118,7 @@ public class Main {
         while(true) {
             try {
                 Scanner userInput = new Scanner(System.in);
-                System.out.println("Podaj numer samochodu który chcesz naprawić");
+                System.out.println("Podaj numer pojazdu który chcesz naprawić");
                 choice = userInput.nextInt() - 1;
                 try {
                     return activePlayer.getVehicle(choice).getEfficientElements().repair(activePlayer);
@@ -149,7 +149,7 @@ public class Main {
         while(true) {
             try {
                 Scanner userInput = new Scanner(System.in);
-                System.out.println("Podaj numer samochodu który chcesz sprzedać");
+                System.out.println("Podaj numer pojazdu który chcesz sprzedać");
                 choice = userInput.nextInt() - 1;
                 try {
                     return activePlayer.getInterestedClients(activePlayer.getVehicle(choice),clients);
@@ -218,7 +218,7 @@ public class Main {
         while(true) {
             try {
                 Scanner userInput = new Scanner(System.in);
-                System.out.println("Podaj numer samochodu którego hitorię napraw chcesz wyświetlić");
+                System.out.println("Podaj numer pojazdu którego hitorię napraw chcesz wyświetlić");
                 choice = userInput.nextInt() - 1;
                 try {
                     for (String repair : activePlayer.getVehicle(choice).getRepairHistory()) {
@@ -242,7 +242,7 @@ public class Main {
         while(true) {
             try {
                 Scanner userInput = new Scanner(System.in);
-                System.out.println("Podaj numer samochodu którego hitorię napraw chcesz wyświetlić");
+                System.out.println("Podaj numer pojazdu którego hitorię napraw chcesz wyświetlić");
                 choice = userInput.nextInt() - 1;
                 try {
                     System.out.println("Suma napraw " + activePlayer.getVehicle(choice).getSumOfRepairs());
@@ -258,6 +258,20 @@ public class Main {
         }
         return false;
     }
+    static void operateInstallments(Player activePlayer) {
+        ArrayList<Instalment> instalmentToDelete = new ArrayList<>();
+        for (Instalment instalment: activePlayer.instalments) {
+            if(instalment.getTurnsLeft() > 0) {
+                System.out.println("Klient zapłacił ratę: " + instalment.getInstalmentAmount());
+                activePlayer.earn(instalment.cashOutInstalment());
+            }
+            if(instalment.getTurnsLeft() == 0)
+                instalmentToDelete.add(instalment);
+        }
+        for (Instalment instalment: instalmentToDelete) {
+            activePlayer.instalments.remove(instalment);
+        }
+    }
 
     public static void main(String[] args) {
         int turn = 0;
@@ -268,6 +282,7 @@ public class Main {
             turn++;
             ArrayList<Vehicle> vehicles = Vehicle.generateRandomVehicles(15);
             for (Player activePlayer: players) { // pętla dla tury gracza
+                operateInstallments(activePlayer);
                 Boolean condition;
                 do {
                     condition = play(activePlayer, turn, clients, vehicles);

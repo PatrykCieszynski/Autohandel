@@ -4,16 +4,19 @@ import Autohandel.Vehicles.Vehicle;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Player {
     final static BigDecimal DEFAULT_STARTING_CASH = new BigDecimal("50000.0");
+    final BigDecimal DEFAULT_WASHING_PRICE = new BigDecimal("30");
     String nickname;
     BigDecimal cash;
     ArrayList<Vehicle> vehicles = new ArrayList<>();
     ArrayList<String> transactionHistory = new ArrayList<>();
+    ArrayList<Instalment> instalments = new ArrayList<>();
 
     public Player(String nick) {
         this.nickname = nick;
@@ -23,11 +26,14 @@ public class Player {
     public void pay(BigDecimal cash) {
         this.cash = this.cash.subtract(cash);
     }
+    public void earn(BigDecimal cash) {
+        this.cash = this.cash.add(cash);
+    }
 
     public Boolean buyVehicle(Vehicle veh, ArrayList<Vehicle> vehicles) {
-        BigDecimal price = BigDecimal.valueOf(0);
-        price = price.add(BigDecimal.valueOf(30)); //mycie za 30zł
-        price = price.add(veh.getValue().multiply(BigDecimal.valueOf(0.02), new MathContext(2))); //podatek 2%
+        BigDecimal price = new BigDecimal("0");
+        price = price.add(DEFAULT_WASHING_PRICE);
+        price = price.add(veh.getValue().multiply(new BigDecimal("0.02"), new MathContext(2))); //podatek 2%
         price = price.add(veh.getValue());
         if(this.cash.compareTo(price) < 0) { // compareTo zwraca 1(większe), -1(mniejsze), 0(równe)
             System.out.println("Nie stać cię! Cena z podatkiem i myciem " + price);
@@ -78,19 +84,23 @@ public class Player {
     }
 
     public Boolean sellVehicle(Vehicle veh, Client client, ArrayList<Client> clients) {
+        BigDecimal tax = veh.getValue().multiply(new BigDecimal("0.02")).setScale(2, RoundingMode.DOWN);
         if(client.getCash().compareTo(veh.getValue()) > 0) {
             transactionHistory.add("Sprzedałeś " + veh + " za "+ veh.getValue());
-            this.cash = this.cash.add(veh.getValue());
-            vehicles.remove(veh);
-            clients.remove(client);
-            clients.add(Client.AddRandomClient());
-            clients.add(Client.AddRandomClient());
-            return true;
+            this.earn(veh.getValue());
         }
         else {
-            System.out.println("Klient nie ma tyle pieniędzy");
-            return false;
+            System.out.println("Klient nie ma tyle pieniędzy, ALE kupi pojazd na raty");
+            instalments.add(new Instalment(veh.getValue().multiply(new BigDecimal("0.10")).setScale(2, RoundingMode.DOWN)));
+            transactionHistory.add("Sprzedałeś " + veh + " za "+ veh.getValue() + " w 10 ratach");
         }
+        this.pay(tax);
+        System.out.println("Zapłaciłeś " + tax + " podatku");
+        vehicles.remove(veh);
+        clients.remove(client);
+        clients.add(Client.AddRandomClient());
+        clients.add(Client.AddRandomClient());
+        return true;
     }
 
     public BigDecimal getCash() {
